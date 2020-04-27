@@ -1,12 +1,8 @@
-package com.matthenry87.restapi.exception;
+package com.matthenry87.restapi.exception
 
-public class AlreadyExistsException extends RuntimeException {
+class AlreadyExistsException : RuntimeException {
 
-    public AlreadyExistsException() {
-    }
-
-    public AlreadyExistsException(String message) {
-        super(message);
-    }
+    constructor() {}
+    constructor(message: String?) : super(message) {}
 
 }

@@ -1,75 +1,65 @@
-package com.matthenry87.restapi.store;
+package com.matthenry87.restapi.store
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.validation.annotation.Validated
+import org.springframework.web.bind.annotation.*
+import java.util.stream.Collectors
 
 @RestController
 @RequestMapping("/store")
-public class StoreController {
-
-    private final StoreService storeService;
-    private final StoreMapper storeMapper;
-
-    public StoreController(StoreService storeService, StoreMapper storeMapper) {
-        this.storeService = storeService;
-        this.storeMapper = storeMapper;
-    }
+class StoreController(private val storeService: StoreService, private val storeMapper: StoreMapper) {
 
     @GetMapping
-    public List<StoreModel> get() {
+    fun get(): List<StoreModel> {
 
-        return storeService.getStores().stream()
-                .map(storeMapper::toModel)
-                .collect(Collectors.toList());
+        return storeService.stores.stream()
+                .map { storeEntity: StoreEntity -> storeMapper.toModel(storeEntity) }
+                .collect(Collectors.toList())
     }
 
     @GetMapping("/{id}")
-    public StoreModel getById(@PathVariable String id) {
+    fun getById(@PathVariable id: String?): StoreModel? {
 
-        var storeEntity = storeService.getStore(id);
+        val storeEntity = storeService.getStore(id!!)
 
-        return storeMapper.toModel(storeEntity);
+        return storeMapper.toModel(storeEntity)
     }
 
     @PostMapping
-    public ResponseEntity<StoreModel> post(@RequestBody @Validated(CreateStore.class) StoreModel storeModel) {
+    fun post(@RequestBody @Validated(CreateStore::class) storeModel: StoreModel): ResponseEntity<StoreModel> {
 
-        var storeEntity = storeMapper.toEntity(storeModel);
+        val storeEntity = storeMapper.toEntity(storeModel)
 
-        storeService.createStore(storeEntity);
+        storeService.createStore(storeEntity)
 
-        storeModel.setId(storeEntity.getId());
-        storeModel.setStatus(Status.OPEN);
+        storeModel.id = storeEntity.id
+        storeModel.status = Status.OPEN
 
-        return new ResponseEntity<>(storeModel, HttpStatus.CREATED);
+        return ResponseEntity(storeModel, HttpStatus.CREATED)
     }
 
     @PutMapping("/{id}")
-    public StoreModel put(@RequestBody @Validated(UpdateStore.class) StoreModel storeModel, @PathVariable String id) {
+    fun put(@RequestBody @Validated(UpdateStore::class) storeModel: StoreModel, @PathVariable id: String): StoreModel {
 
-        storeModel.setId(id);
+        storeModel.id = id
 
-        var storeEntity = storeMapper.toEntity(storeModel);
+        val storeEntity = storeMapper.toEntity(storeModel)
 
-        storeService.updateStore(storeEntity);
+        storeService.updateStore(storeEntity)
 
-        return storeModel;
+        return storeModel
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> delete(@PathVariable String id) {
+    fun delete(@PathVariable id: String?): ResponseEntity<Any> {
 
-        storeService.deleteStore(id);
+        storeService.deleteStore(id!!)
 
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return ResponseEntity(HttpStatus.NO_CONTENT)
     }
 
-interface UpdateStore {}
-interface CreateStore {}
+    internal interface UpdateStore
+    internal interface CreateStore
 
 }

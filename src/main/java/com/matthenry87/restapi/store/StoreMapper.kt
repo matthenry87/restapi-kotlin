@@ -5,8 +5,8 @@ import org.mapstruct.Mapper
 @Mapper(componentModel = "spring")
 interface StoreMapper {
 
-    fun toEntity(store: StoreModel?): StoreEntity?
+    fun toEntity(store: StoreModel): StoreEntity
 
-    fun toModel(storeEntity: StoreEntity?): StoreModel?
-    
+    fun toModel(storeEntity: StoreEntity): StoreModel
+
 }
